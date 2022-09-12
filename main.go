@@ -2,59 +2,35 @@ package main
 
 import (
 	"context"
-	"encoding/json"
-	"io/ioutil"
 	"log"
+	"os"
 
+	"github.com/joho/godotenv"
 	g "github.com/serpapi/google-search-results-golang"
 	"github.com/shomali11/slacker"
 )
 
 // function to load .env file and return env variables
-// func goDotEnvVariable(key string) string {
-// 	err := godotenv.Load(".env")
-
-// 	if err != nil {
-// 		log.Fatalf("Error loading .env file")
-// 	}
-
-// 	return os.Getenv(key)
-// }
-
-type apiConfigData struct {
-	WEB_SCRAP_API_KEY string `json:"WEB_SCRAP_API_KEY"`
-	SLACK_BOT_TOKEN   string `json:"SLACK_BOT_TOKEN"`
-	SLACK_APP_TOKEN   string `json:"SLACK_APP_TOKEN"`
-}
-
-func loadApiConfig(filename string) (apiConfigData, error) {
-	bytes, err := ioutil.ReadFile(filename)
+func goDotEnvVariable(key string) string {
+	err := godotenv.Load(".env")
 
 	if err != nil {
-		return apiConfigData{}, err
+		log.Fatalf("Error loading .env file")
 	}
 
-	var config apiConfigData
-	err = json.Unmarshal(bytes, &config)
-	if err != nil {
-		return apiConfigData{}, err
-	}
-	return config, nil
+	return os.Getenv(key)
 }
+
 func webScrap(query string) string {
-	apiConfig, x := loadApiConfig(".apiConfig")
-	if x != nil {
-		log.Fatal(x)
-		return ""
-	}
+
 	parameter := map[string]string{
 		"q":       query,
 		"tbm":     "isch",
 		"ijn":     "0",
-		"api_key": apiConfig.WEB_SCRAP_API_KEY,
+		"api_key": goDotEnvVariable("WEB_SCRAP_API_KEY"),
 	}
 
-	search := g.NewGoogleSearch(parameter, apiConfig.WEB_SCRAP_API_KEY)
+	search := g.NewGoogleSearch(parameter, goDotEnvVariable("WEB_SCRAP_API_KEY"))
 	results, err := search.GetJSON()
 	if err != nil {
 		return err.Error()
@@ -64,13 +40,8 @@ func webScrap(query string) string {
 }
 
 func main() {
-	apiConfig, x := loadApiConfig(".apiConfig")
-	if x != nil {
-		log.Fatal(x)
-		return
-	}
 
-	bot := slacker.NewClient(apiConfig.SLACK_BOT_TOKEN, apiConfig.SLACK_APP_TOKEN)
+	bot := slacker.NewClient(goDotEnvVariable("SLACK_BOT_TOKEN"), goDotEnvVariable("SLACK_APP_TOKEN"))
 
 	definition := &slacker.CommandDefinition{
 		Description: "Enter a query to search for!",
