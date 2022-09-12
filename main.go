@@ -2,34 +2,59 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"io/ioutil"
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
 	g "github.com/serpapi/google-search-results-golang"
 	"github.com/shomali11/slacker"
 )
 
 // function to load .env file and return env variables
-func goDotEnvVariable(key string) string {
-	err := godotenv.Load(".env")
+// func goDotEnvVariable(key string) string {
+// 	err := godotenv.Load(".env")
 
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
+// 	if err != nil {
+// 		log.Fatalf("Error loading .env file")
+// 	}
 
-	return os.Getenv(key)
+// 	return os.Getenv(key)
+// }
+
+type apiConfigData struct {
+	WEB_SCRAP_API_KEY string `json:"WEB_SCRAP_API_KEY"`
+	SLACK_BOT_TOKEN   string `json:"SLACK_BOT_TOKEN"`
+	SLACK_APP_TOKEN   string `json:"SLACK_APP_TOKEN"`
 }
 
+func loadApiConfig(filename string) (apiConfigData, error) {
+	bytes, err := ioutil.ReadFile(filename)
+
+	if err != nil {
+		return apiConfigData{}, err
+	}
+
+	var config apiConfigData
+	err = json.Unmarshal(bytes, &config)
+	if err != nil {
+		return apiConfigData{}, err
+	}
+	return config, nil
+}
 func webScrap(query string) string {
+	apiConfig, x := loadApiConfig(".apiConfig")
+	if x != nil {
+		log.Fatal(x)
+		return ""
+	}
 	parameter := map[string]string{
 		"q":       query,
 		"tbm":     "isch",
 		"ijn":     "0",
-		"api_key": "38f86475574fdc5f19cf74e393dcc24f568bb68ca6a213a711ab63ecac59adab",
+		"api_key": apiConfig.WEB_SCRAP_API_KEY,
 	}
 
-	search := g.NewGoogleSearch(parameter, "38f86475574fdc5f19cf74e393dcc24f568bb68ca6a213a711ab63ecac59adab")
+	search := g.NewGoogleSearch(parameter, apiConfig.WEB_SCRAP_API_KEY)
 	results, err := search.GetJSON()
 	if err != nil {
 		return err.Error()
@@ -39,7 +64,13 @@ func webScrap(query string) string {
 }
 
 func main() {
-	bot := slacker.NewClient("xoxb-4063480188803-4063522353843-XK840kQJ1g8lc51Qi7OBWXCj", "xapp-1-A041VF9U51R-4064536318866-fc0897c14b4616de3e0cecd5668f57745d9876c7222bde5ea49b89e023dd7eee")
+	apiConfig, x := loadApiConfig(".apiConfig")
+	if x != nil {
+		log.Fatal(x)
+		return
+	}
+
+	bot := slacker.NewClient(apiConfig.SLACK_BOT_TOKEN, apiConfig.SLACK_APP_TOKEN)
 
 	definition := &slacker.CommandDefinition{
 		Description: "Enter a query to search for!",
