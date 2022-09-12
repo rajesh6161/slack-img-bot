@@ -10,23 +10,6 @@ import (
 	"github.com/shomali11/slacker"
 )
 
-func webScrap(query string) string {
-	parameter := map[string]string{
-		"q":       query,
-		"tbm":     "isch",
-		"ijn":     "0",
-		"api_key": "38f86475574fdc5f19cf74e393dcc24f568bb68ca6a213a711ab63ecac59adab",
-	}
-
-	search := g.NewGoogleSearch(parameter, "38f86475574fdc5f19cf74e393dcc24f568bb68ca6a213a711ab63ecac59adab")
-	results, err := search.GetJSON()
-	if err != nil {
-		return err.Error()
-	}
-	images_results := results["images_results"].([]interface{})
-	return images_results[0].(map[string]interface{})["original"].(string)
-}
-
 // function to load .env file and return env variables
 func goDotEnvVariable(key string) string {
 	err := godotenv.Load(".env")
@@ -36,6 +19,23 @@ func goDotEnvVariable(key string) string {
 	}
 
 	return os.Getenv(key)
+}
+
+func webScrap(query string) string {
+	parameter := map[string]string{
+		"q":       query,
+		"tbm":     "isch",
+		"ijn":     "0",
+		"api_key": goDotEnvVariable("WEB_SCRAP_API_KEY"),
+	}
+
+	search := g.NewGoogleSearch(parameter, goDotEnvVariable("WEB_SCRAP_API_KEY"))
+	results, err := search.GetJSON()
+	if err != nil {
+		return err.Error()
+	}
+	images_results := results["images_results"].([]interface{})
+	return images_results[0].(map[string]interface{})["original"].(string)
 }
 
 func main() {
