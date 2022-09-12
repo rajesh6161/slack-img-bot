@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 	g "github.com/serpapi/google-search-results-golang"
 	"github.com/shomali11/slacker"
 )
