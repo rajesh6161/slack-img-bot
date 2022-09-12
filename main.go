@@ -10,6 +10,17 @@ import (
 	"github.com/shomali11/slacker"
 )
 
+// function to load .env file and return env variables
+func goDotEnvVariable(key string) string {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+
+	return os.Getenv(key)
+}
+
 func webScrap(query string) string {
 	parameter := map[string]string{
 		"q":       query,
@@ -27,19 +38,8 @@ func webScrap(query string) string {
 	return images_results[0].(map[string]interface{})["original"].(string)
 }
 
-// function to load .env file and return env variables
-func goDotEnvVariable(key string) string {
-	err := godotenv.Load(".env")
-
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
-
-	return os.Getenv(key)
-}
-
 func main() {
-	bot := slacker.NewClient(goDotEnvVariable("SLACK_BOT_TOKEN"), goDotEnvVariable("SLACK_APP_TOKEN"))
+	bot := slacker.NewClient("xoxb-4063480188803-4063522353843-XK840kQJ1g8lc51Qi7OBWXCj", "xapp-1-A041VF9U51R-4064536318866-fc0897c14b4616de3e0cecd5668f57745d9876c7222bde5ea49b89e023dd7eee")
 
 	definition := &slacker.CommandDefinition{
 		Description: "Enter a query to search for!",
