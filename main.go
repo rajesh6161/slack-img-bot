@@ -3,23 +3,21 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 
-	"github.com/joho/godotenv"
 	g "github.com/serpapi/google-search-results-golang"
 	"github.com/shomali11/slacker"
 )
 
 // function to load .env file and return env variables
-func goDotEnvVariable(key string) string {
-	err := godotenv.Load(".env")
+// func goDotEnvVariable(key string) string {
+// 	err := godotenv.Load(".env")
 
-	if err != nil {
-		log.Fatalf("Error loading .env file")
-	}
+// 	if err != nil {
+// 		log.Fatalf("Error loading .env file")
+// 	}
 
-	return os.Getenv(key)
-}
+// 	return os.Getenv(key)
+// }
 
 func webScrap(query string) string {
 	parameter := map[string]string{
@@ -39,7 +37,7 @@ func webScrap(query string) string {
 }
 
 func main() {
-	bot := slacker.NewClient("xoxb-4063480188803-4063522353843-XK840kQJ1g8lc51Qi7OBWXCj", "xapp-1-A041VF9U51R-4064536318866-fc0897c14b4616de3e0cecd5668f57745d9876c7222bde5ea49b89e023dd7eee")
+	bot := slacker.NewClient("xoxb-4063480188803-4063522353843-vOreP0Ptz9bGMERICqVI8Cen", "xapp-1-A041VF9U51R-4054047752951-b9e3749e8302d358526b56199deceeff6b2eeea71e84a31b56e0353a3dff0f1d")
 
 	definition := &slacker.CommandDefinition{
 		Description: "Enter a query to search for!",
